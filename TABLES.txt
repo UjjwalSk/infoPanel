@@ -1,9 +1,11 @@
+> TABLE Department :-
 CREATE TABLE Department(
     deptID INT PRIMARY KEY,
     deptName VARCHAR2(45) NOT NULL,
     officeNo INT NOT NULL
 );
 
+> TABLE EMPLOYEE :-
 CREATE TABLE EMPLOYEE(
     employeeID INT PRIMARY KEY,
     fullName VARCHAR2(45) NOT NULL,
@@ -15,6 +17,7 @@ CREATE TABLE EMPLOYEE(
     FOREIGN KEY (deptID) references DEPARTMENT(DEPTID) ON DELETE CASCADE
 );
 
+> TABLE EMPLOYEE_SAL_DETAILS :-
 CREATE TABLE EMPLOYEE_SAL_DETAILS(
     accountNo INT PRIMARY KEY,
     employeeID INT UNIQUE NOT NULL,
@@ -24,22 +27,26 @@ CREATE TABLE EMPLOYEE_SAL_DETAILS(
     FOREIGN KEY (employeeID) references EMPLOYEE(employeeID) ON DELETE CASCADE
 );
 
+> TABLE ADMINISTRATION :-
 CREATE TABLE ADMINISTRATION(
     administratorID INT PRIMARY KEY,
     designation VARCHAR2(45),
     FOREIGN KEY (administratorID) REFERENCES EMPLOYEE(employeeID) ON DELETE CASCADE
 );
 
+> TABLE MENTOR :-
 CREATE TABLE MENTOR(
     mentorID INT PRIMARY KEY,
     FOREIGN KEY (mentorID) REFERENCES EMPLOYEE(employeeID) ON DELETE CASCADE
 );
 
+> TABLE INSTRUCTOR :-
 CREATE TABLE INSTRUCTOR(
     instructorID INT PRIMARY KEY,
     FOREIGN KEY (instructorID) REFERENCES EMPLOYEE(employeeID) ON DELETE CASCADE
 );
 
+> TABLE GUARDIAN :-
 CREATE TABLE GUARDIAN(
     guardianID INT PRIMARY KEY,
     fatherName VARCHAR2(45) NOT NULL,
@@ -48,6 +55,7 @@ CREATE TABLE GUARDIAN(
     phoneNo INT NOT NULL
 );
 
+> TABLE Student :-
 CREATE TABLE Student(
     studentID INT PRIMARY KEY,
     fullName varchar2(45) NOT NULL,
@@ -64,6 +72,7 @@ CREATE TABLE Student(
     FOREIGN KEY (guardianID) references GUARDIAN(guardianID) ON DELETE CASCADE
 );
 
+> TABLE Course :-
 CREATE TABLE Course(
     courseID INT PRIMARY KEY,
     courseName VARCHAR2(45) NOT NULL,
@@ -74,6 +83,7 @@ CREATE TABLE Course(
     FOREIGN KEY (deptID) references DEPARTMENT(DEPTID) ON DELETE CASCADE
 );
 
+> TABLE stud_visaDetails :-
 CREATE TABLE stud_visaDetails(
     studentID INT PRIMARY KEY,
     visaNo INT UNIQUE NOT NULL,
@@ -81,12 +91,14 @@ CREATE TABLE stud_visaDetails(
     FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
 );
 
+> TABLE coop :-
 CREATE TABLE coop(
     coopID INT PRIMARY KEY,
     company_Name VARCHAR2(45) NOT NULL,
     position VARCHAR2(45) NOT NULL
 );
 
+> TABLE student_has_coop :-
 CREATE TABLE student_has_coop(
     studentID INT PRIMARY KEY,
     duration INT NOT NULL,
@@ -96,6 +108,7 @@ CREATE TABLE student_has_coop(
     FOREIGN KEY (coopID) REFERENCES coop(coopID) ON DELETE CASCADE
 );
 
+> TABLE studAcademicRecord :-
 CREATE TABLE studAcademicRecord(
     studentID INT PRIMARY KEY,
     lastCGPA FLOAT NOT NULL,
@@ -103,6 +116,7 @@ CREATE TABLE studAcademicRecord(
     FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
 );
 
+> TABLE attendance :-
 CREATE TABLE attendance(
     studentID INT NOT NULL,
     curAttendance INT NOT NULL,
@@ -113,6 +127,7 @@ CREATE TABLE attendance(
 );
 
 
+> TABLE GradeReport :-
 CREATE TABLE GradeReport(
     reportID INT PRIMARY KEY,
     courseID INT NOT NULL,
@@ -123,6 +138,7 @@ CREATE TABLE GradeReport(
     FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
 );
 
+> TABLE Fee_Payment :-
 CREATE TABLE Fee_Payment(
     billID INT PRIMARY KEY,
     studentID INT NOT NULL,
@@ -133,12 +149,14 @@ CREATE TABLE Fee_Payment(
     FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
 );
 
+> TABLE feeDues :-
 CREATE TABLE feeDues(
     billID INT PRIMARY KEY,
     dueAmnt INT NOT NULL,
     FOREIGN KEY (billID) REFERENCES Fee_Payment(billID) ON DELETE CASCADE
 );
 
+> TABLE student_registers_courses :-
 CREATE TABLE student_registers_courses(
     studentID INT NOT NULL,
     courseID INT NOT NULL,
@@ -147,11 +165,13 @@ CREATE TABLE student_registers_courses(
     FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
 );
 
+> TABLE BUILDING :-
 CREATE TABLE BUILDING(
     buildingID INT PRIMARY KEY,
     buildingName VARCHAR(45) NOT NULL  
 );
 
+> TABLE ROOM :-
 CREATE TABLE ROOM(
     roomNO INT PRIMARY KEY,
     buildingID INT NOT NULL,
@@ -159,6 +179,7 @@ CREATE TABLE ROOM(
     FOREIGN KEY (buildingID) references building(buildingID) ON DELETE CASCADE
 );
 
+> TABLE GROUPS :-
 CREATE TABLE GROUPS(
     groupNo INT PRIMARY KEY,
     courseID INT NOT NULL,
@@ -171,6 +192,7 @@ CREATE TABLE GROUPS(
     FOREIGN KEY (buildingID) REFERENCES BUILDING(buildingID) ON DELETE CASCADE
 );
 
+> TABLE Group_dayslot :-
 CREATE TABLE Group_dayslot(
     day VARCHAR(10) NOT NULL,
     groupNo INT NOT NULL,
@@ -179,14 +201,18 @@ CREATE TABLE Group_dayslot(
     FOREIGN KEY (groupNo) REFERENCES GROUPS(groupNo) ON DELETE CASCADE
 );
 
+> TABLE assignment :-
 CREATE TABLE assignment(
     assignmentID INT PRIMARY KEY,
     groupNo INT NOT NULL,
+    courseID INT NOT NULL,
     deadlineDate DATE NOT NULL,
     maxScore INT NOT NULL,
-    FOREIGN KEY (groupNo) REFERENCES GROUPS(groupNo) ON DELETE CASCADE
+    FOREIGN KEY (groupNo) REFERENCES GROUPS(groupNo) ON DELETE CASCADE,
+    FOREIGN KEY (courseID) REFERENCES COURSE(COURSEID) ON DELETE CASCADE
 );
 
+> TABLE assignment_submissions :-
 CREATE TABLE assignment_submissions(
     assignmentID INT PRIMARY KEY,
     studentID INT NOT NULL,
@@ -197,16 +223,19 @@ CREATE TABLE assignment_submissions(
     FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
 );
 
+> TABLE Librarian :-
 CREATE TABLE Librarian(
     librarianID INT PRIMARY KEY,
     FOREIGN KEY (librarianID) REFERENCES EMPLOYEE(employeeID) ON DELETE CASCADE
 );
 
+> TABLE BOOK :-
 CREATE TABLE BOOK(
     bookID INT PRIMARY KEY,
     bookName VARCHAR2(45)
 );
 
+> TABLE Librarian_maintains :-
 CREATE TABLE Librarian_maintains(
     bookID INT PRIMARY KEY,
     librarianID INT NOT NULL,
@@ -216,6 +245,7 @@ CREATE TABLE Librarian_maintains(
     FOREIGN KEY (librarianID) references Librarian(librarianID) ON DELETE CASCADE
 );
 
+> TABLE Book_has_copies :-
 CREATE TABLE Book_has_copies(
     copyNo INT PRIMARY KEY,
     bookID INT NOT NULL,
@@ -223,6 +253,7 @@ CREATE TABLE Book_has_copies(
     FOREIGN KEY (bookID) references BOOK(bookID) ON DELETE CASCADE
 );
 
+> TABLE instructor_has_books :-
 CREATE TABLE instructor_has_books(
     copyNo INT PRIMARY KEY,
     instructorID INT NOT NULL,
@@ -232,6 +263,7 @@ CREATE TABLE instructor_has_books(
     FOREIGN KEY (instructorID) references INSTRUCTOR(instructorID) ON DELETE CASCADE
 );
 
+> TABLE student_issues_books :-
 CREATE TABLE student_issues_books(
     copyNo INT PRIMARY KEY,
     studentID INT NOT NULL,
@@ -241,12 +273,47 @@ CREATE TABLE student_issues_books(
     FOREIGN KEY (studentID) references Student(studentID) ON DELETE CASCADE
 );
 
+Sequences:-
+create sequence ForStudents start with 1;
+create sequence ForGuardians start with 1;		
+create sequence ForDept start with 10 increment by 10;
+create sequence ForEmp start with 100;
+create sequence ForGroups start with 1;	
+create sequence ForBookCopies start with 1;	
+create sequence ForCourses start with 10 increment by 10;	
 
 
+> Triggers:-
 
+• Trigger to update the status of the book when any student issues/returns the book.
+CREATE TRIGGER update_Stud_issue_Status
+AFTER INSERT OR UPDATE OR DELETE ON STUDENT_ISSUES_BOOKS
+FOR EACH ROW
+BEGIN
+IF inserting THEN update book_has_copies set status = 'N' where copyNo = :New.copyNo;
+ELSIF (updating AND (:NEW.returnDate IS NOT NULL)) OR deleting THEN update book_has_copies set status = 'Y' where copyNo = :New.copyNo;
+END IF;
+END;
 
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬	
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬	
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬	
+• Trigger to update the status of the book when any instructor issues/returns the book.
+CREATE TRIGGER update_instructor_issue_Status
+AFTER INSERT OR UPDATE OR DELETE ON INSTRUCTOR_HAS_BOOKS
+FOR EACH ROW
+BEGIN
+IF inserting THEN update book_has_copies set status = 'N' where copyNo =          :New.copyNo;
+ELSIF (updating AND (:NEW.returnDate IS NOT NULL)) OR deleting THEN update book_has_copies set status = 'Y' where copyNo = :New.copyNo;
+END IF;
+END;
+
+• Trigger to insert the billID of fee_payment table into dues table if there is some due.
+CREATE TRIGGER FEE_PAYMENT_TRIGGER 
+AFTER INSERT ON FEE_PAYMENT
+FOR EACH ROW
+DECLARE 
+due NUMBER:=:NEW.totalAmnt-:NEW.AMOUNT_PAID;
+BEGIN
+IF due!=0 THEN
+insert into FEEDUES values(:NEW.billID,due);
+END IF;
+END;
 
