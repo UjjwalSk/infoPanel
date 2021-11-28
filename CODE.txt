@@ -1,0 +1,501 @@
+<----------------- TABLES ----------------->
+
+> TABLE DEPARTMENT :-
+CREATE TABLE Department(
+    deptID INT PRIMARY KEY,
+    deptName VARCHAR2(45) NOT NULL,
+    officeNo INT NOT NULL
+);
+
+> TABLE EMPLOYEE :-
+CREATE TABLE EMPLOYEE(
+    employeeID INT PRIMARY KEY,
+    fullName VARCHAR2(45) NOT NULL,
+    contactNo INT UNIQUE NOT NULL,
+    email VARCHAR2(45) UNIQUE NOT NULL,
+    address VARCHAR2(60) NOT NULL,
+    hiringDate DATE,
+    deptID INT NOT NULL,
+    FOREIGN KEY (deptID) references DEPARTMENT(DEPTID) ON DELETE CASCADE
+);
+
+> TABLE EMPLOYEE_SAL_DETAILS :-
+CREATE TABLE EMPLOYEE_SAL_DETAILS(
+    accountNo INT PRIMARY KEY,
+    employeeID INT UNIQUE NOT NULL,
+    accountName VARCHAR2(45) NOT NULL,
+    salary FLOAT NOT NULL,
+    deductions FLOAT,
+    FOREIGN KEY (employeeID) references EMPLOYEE(employeeID) ON DELETE CASCADE
+);
+
+> TABLE ADMINISTRATION :-
+CREATE TABLE ADMINISTRATION(
+    administratorID INT PRIMARY KEY,
+    designation VARCHAR2(45),
+    FOREIGN KEY (administratorID) REFERENCES EMPLOYEE(employeeID) ON DELETE CASCADE
+);
+
+> TABLE MENTOR :-
+CREATE TABLE MENTOR(
+    mentorID INT PRIMARY KEY,
+    FOREIGN KEY (mentorID) REFERENCES EMPLOYEE(employeeID) ON DELETE CASCADE
+);
+
+> TABLE INSTRUCTOR :-
+CREATE TABLE INSTRUCTOR(
+    instructorID INT PRIMARY KEY,
+    FOREIGN KEY (instructorID) REFERENCES EMPLOYEE(employeeID) ON DELETE CASCADE
+);
+
+> TABLE GUARDIAN :-
+CREATE TABLE GUARDIAN(
+    guardianID INT PRIMARY KEY,
+    fatherName VARCHAR2(45) NOT NULL,
+    motherName VARCHAR2(45) NOT NULL,
+    address VARCHAR2(60) NOT NULL,
+    phoneNo INT NOT NULL
+);
+
+> TABLE STUDENT :-
+CREATE TABLE Student(
+    studentID INT PRIMARY KEY,
+    fullName VARCHAR2(45) NOT NULL,
+    DOB DATE NOT NULL,
+    currAddress VARCHAR2(60) NOT NULL,
+    gender CHAR(1) NOT NULL,
+    phoneNo INT UNIQUE NOT NULL,
+    email VARCHAR2(40) UNIQUE NOT NULL,
+    deptID INT NOT NULL,
+    guardianID INT NOT NULL,
+    FOREIGN KEY (deptID) references DEPARTMENT(deptID) ON DELETE CASCADE,
+    FOREIGN KEY (guardianID) references GUARDIAN(guardianID) ON DELETE CASCADE
+);
+
+> TABLE COURSE :-
+CREATE TABLE Course(
+    courseID INT PRIMARY KEY,
+    courseName VARCHAR2(45) NOT NULL,
+    credits INT NOT NULL,
+    hours INT NOT NULL,
+    numLectures INT NOT NULL,
+    deptID INT NOT NULL,
+    FOREIGN KEY (deptID) references DEPARTMENT(DEPTID) ON DELETE CASCADE
+);
+
+> TABLE STUD_VISADETAILS :-
+CREATE TABLE stud_visaDetails(
+    studentID INT PRIMARY KEY,
+    visaNo INT UNIQUE NOT NULL,
+    visaStatus VARCHAR2(40) NOT NULL,
+    FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
+);
+
+> TABLE COOP :-
+CREATE TABLE coop(
+    coopID INT PRIMARY KEY,
+    company_Name VARCHAR2(45) NOT NULL,
+    position VARCHAR2(45) NOT NULL
+);
+
+> TABLE STUDENT_HAS_COOP :-
+CREATE TABLE student_has_coop(
+    studentID INT PRIMARY KEY,
+    duration INT NOT NULL,
+    salary INT NOT NULL,
+    coopID INT NOT NULL,
+    FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE,
+    FOREIGN KEY (coopID) REFERENCES coop(coopID) ON DELETE CASCADE
+);
+
+> TABLE STUDACADEMICRECORD :-
+CREATE TABLE studAcademicRecord(
+    studentID INT PRIMARY KEY,
+    lastCGPA FLOAT NOT NULL,
+    currCGPA FLOAT NOT NULL,
+    FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
+);
+
+
+> TABLE STUDENT_REGISTERS_COURSES :-
+CREATE TABLE student_registers_courses(
+    studentID INT NOT NULL,
+    courseID INT NOT NULL,
+    registrationDate DATE,
+    PRIMARY KEY(studentID,courseID),
+    FOREIGN KEY (courseID) REFERENCES Course(courseID) ON DELETE CASCADE,
+    FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
+);
+
+> TABLE ATTENDANCE :-
+CREATE TABLE attendance(
+    studentID INT NOT NULL,
+    curAttendance INT NOT NULL,
+    totalAttendance INT NOT NULL,
+    courseID INT NOT NULL,
+    PRIMARY KEY(studentID,courseID),
+    FOREIGN KEY (studentID,courseID) REFERENCES student_registers_courses(studentID,courseID) ON DELETE CASCADE
+);
+
+> TABLE GRADEREPORT :-
+CREATE TABLE GradeReport(
+    reportID INT PRIMARY KEY,
+    courseID INT NOT NULL,
+    studentID INT NOT NULL,
+    numericGrade FLOAT NOT NULL,
+    semester INT NOT NULL,
+    FOREIGN KEY (courseID) REFERENCES Course(courseID) ON DELETE CASCADE,
+    FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
+);
+
+> TABLE FEE_PAYMENT :-
+CREATE TABLE Fee_Payment(
+    billID INT PRIMARY KEY,
+    studentID INT NOT NULL,
+    date_of_payment DATE NOT NULL,
+    totalAmnt INT NOT NULL,
+    Amount_Paid INT NOT NULL,
+    semester INT NOT NULL,
+    FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
+);
+
+> TABLE FEEDUES :-
+CREATE TABLE feeDues(
+    billID INT PRIMARY KEY,
+    dueAmnt INT NOT NULL,
+    FOREIGN KEY (billID) REFERENCES Fee_Payment(billID) ON DELETE CASCADE
+);
+
+> TABLE BUILDING :-
+CREATE TABLE BUILDING(
+    buildingID INT PRIMARY KEY,
+    buildingName VARCHAR(45) NOT NULL  
+);
+
+> TABLE ROOM :-
+CREATE TABLE ROOM(
+    roomNO INT PRIMARY KEY,
+    buildingID INT NOT NULL,
+    capacity INT NOT NULL,
+    FOREIGN KEY (buildingID) references building(buildingID) ON DELETE CASCADE
+);
+
+> TABLE GROUPS :-
+CREATE TABLE GROUPS(
+    groupNo INT PRIMARY KEY,
+    courseID INT NOT NULL,
+    instructorID INT NOT NULL,
+    mentorID INT NOT NULL,
+    buildingID INT NOT NULL,
+    FOREIGN KEY (courseID) REFERENCES Course(courseID) ON DELETE CASCADE,
+    FOREIGN KEY (instructorID) REFERENCES INSTRUCTOR(instructorID) ON DELETE CASCADE,
+    FOREIGN KEY (mentorID) REFERENCES MENTOR(mentorID) ON DELETE CASCADE,
+    FOREIGN KEY (buildingID) REFERENCES BUILDING(buildingID) ON DELETE CASCADE
+);
+
+> TABLE GROUP_DAYSLOT :-
+CREATE TABLE Group_dayslot(
+    day VARCHAR(10) NOT NULL,
+    groupNo INT NOT NULL,
+    startTime INTERVAL DAY TO SECOND(2) NOT NULL,
+    endTime INTERVAL DAY TO SECOND(2) NOT NULL,
+    FOREIGN KEY (groupNo) REFERENCES GROUPS(groupNo) ON DELETE CASCADE
+);
+
+> TABLE ASSIGNMENT :-
+CREATE TABLE assignment(
+    assignmentID INT PRIMARY KEY,
+    groupNo INT NOT NULL,
+    courseID INT NOT NULL,
+    deadlineDate DATE NOT NULL,
+    maxScore INT NOT NULL,
+    FOREIGN KEY (groupNo) REFERENCES GROUPS(groupNo) ON DELETE CASCADE,
+    FOREIGN KEY (courseID) REFERENCES COURSE(COURSEID) ON DELETE CASCADE
+);
+
+> TABLE ASSIGNMENT_SUBMISSIONS :-
+CREATE TABLE assignment_submissions(
+    assignmentID INT PRIMARY KEY,
+    studentID INT NOT NULL,
+    submissionDate DATE NOT NULL,
+    evaluationDate DATE NOT NULL,
+    marksObtained INT NOT NULL,
+    FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID) ON DELETE CASCADE,
+    FOREIGN KEY (studentID) REFERENCES Student(studentID) ON DELETE CASCADE
+);
+
+> TABLE LIBRARIAN :-
+CREATE TABLE Librarian(
+    librarianID INT PRIMARY KEY,
+    FOREIGN KEY (librarianID) REFERENCES EMPLOYEE(employeeID) ON DELETE CASCADE
+);
+
+> TABLE BOOK :-
+CREATE TABLE BOOK(
+    bookID INT PRIMARY KEY,
+    bookName VARCHAR2(45)
+);
+
+> TABLE LIBRARIAN_MAINTAINS :-
+CREATE TABLE Librarian_maintains(
+    bookID INT PRIMARY KEY,
+    librarianID INT NOT NULL,
+    amount FLOAT NOT NULL,
+    quantity INT NOT NULL,
+    FOREIGN KEY (bookID) references BOOK(bookID) ON DELETE CASCADE,
+    FOREIGN KEY (librarianID) references Librarian(librarianID) ON DELETE CASCADE
+);
+
+> TABLE BOOK_HAS_COPIES :-
+CREATE TABLE Book_has_copies(
+    copyNo INT NOT NULL,
+    bookID INT NOT NULL,
+    status CHAR NOT NULL,
+    PRIMARY KEY(copyNo,bookID),
+    FOREIGN KEY (bookID) references BOOK(bookID) ON DELETE CASCADE
+);
+
+> TABLE INSTRUCTOR_HAS_BOOKS :-
+CREATE TABLE instructor_has_books(
+    copyNo INT NOT NULL,
+    bookID INT NOT NULL,
+    instructorID INT NOT NULL,
+    issueDate DATE NOT NULL,
+    returnDate DATE,
+    PRIMARY KEY(copyNo,bookID),
+    FOREIGN KEY (copyNo,bookID) references Book_has_copies(copyNo,bookID) ON DELETE CASCADE,
+    FOREIGN KEY (instructorID) references INSTRUCTOR(instructorID) ON DELETE CASCADE
+);
+
+> TABLE STUDENT_ISSUES_BOOKS :-
+CREATE TABLE student_issues_books(
+    copyNo INT NOT NULL,
+    bookID INT NOT NULL,
+    studentID INT NOT NULL,
+    issueDate DATE NOT NULL,
+    returnDate DATE,
+    PRIMARY KEY(copyNo,bookID),
+    FOREIGN KEY (copyNo,bookID) references Book_has_copies(copyNo,bookID) ON DELETE CASCADE,
+    FOREIGN KEY (studentID) references Student(studentID) ON DELETE CASCADE
+);
+
+<----------------- SEQUENCES ----------------->
+
+create sequence ForStudents start with 1;
+create sequence ForGuardians start with 1;		
+create sequence ForDept start with 10 increment by 10;
+create sequence ForEmp start with 100;
+create sequence ForGroups start with 1;	
+create sequence ForBookCopies start with 1;	
+create sequence ForCourses start with 10 increment by 10;
+
+
+<----------------- TRIGGERS ----------------->
+
+• Trigger to update the status of the book when any student issues/returns the book.
+CREATE OR REPLACE TRIGGER update_Stud_issue_Status
+AFTER INSERT OR UPDATE OR DELETE ON STUDENT_ISSUES_BOOKS
+FOR EACH ROW
+DECLARE
+    currStatus CHAR;
+BEGIN
+    IF inserting THEN 
+        select status into currStatus from BOOK_HAS_COPIES where (copyNo = :New.copyNo AND bookID = :New.bookID);
+        IF currStatus='N' THEN raise_application_error( -20001, 'BOOK ALREADY ISSUED!!!');
+        ELSE update book_has_copies set status = 'N' where (copyNo = :New.copyNo AND bookID = :New.bookID);
+        END IF;
+    ELSIF (updating AND (:NEW.returnDate IS NOT NULL)) OR deleting THEN update book_has_copies set status = 'Y' where (copyNo = :OLD.copyNo AND bookID = :OLD.bookID);
+    END IF;
+END;
+
+• Trigger to update the status of the book when any instructor issues/returns the book.
+CREATE OR REPLACE TRIGGER update_instructor_issue_Status
+AFTER INSERT OR UPDATE OR DELETE ON INSTRUCTOR_HAS_BOOKS
+FOR EACH ROW
+DECLARE
+    currStatus CHAR;
+BEGIN
+    IF inserting THEN 
+        select status into currStatus from BOOK_HAS_COPIES where (copyNo = :New.copyNo AND bookID = :New.bookID);
+        IF currStatus='N' THEN raise_application_error( -20001, 'BOOK ALREADY ISSUED!!!');
+        ELSE update book_has_copies set status = 'N' where (copyNo = :New.copyNo AND bookID = :New.bookID);
+        END IF;
+    ELSIF (updating AND (:NEW.returnDate IS NOT NULL)) OR deleting THEN update book_has_copies set status = 'Y' where (copyNo = :OLD.copyNo AND bookID = :OLD.bookID);
+    END IF;
+END;
+
+• Trigger to insert the billID of fee_payment table into dues table if there is some due.
+CREATE TRIGGER FEE_PAYMENT_TRIGGER 
+AFTER INSERT ON FEE_PAYMENT
+FOR EACH ROW
+DECLARE 
+due NUMBER:=:NEW.totalAmnt-:NEW.AMOUNT_PAID;
+BEGIN
+IF due!=0 THEN
+insert into FEEDUES values(:NEW.billID,due);
+END IF;
+END;
+
+• Trigger to insert default attendance values in attendance table whenever student registers a new course.
+CREATE OR REPLACE TRIGGER on_stud_courses_registration
+AFTER INSERT ON student_registers_courses
+FOR EACH ROW
+BEGIN
+    INSERT INTO ATTENDANCE VALUES(:NEW.STUDENTID,0,0,:NEW.COURSEID);
+END;
+
+<----------------- INSERTION ----------------->
+
+DEPARTMENT :
+INSERT INTO DEPARTMENT VALUES(FORDEPT.NEXTVAL , 'ECE' , 11);
+INSERT INTO DEPARTMENT VALUES(FORDEPT.NEXTVAL , 'IT' , 9);
+INSERT INTO DEPARTMENT VALUES(FORDEPT.NEXTVAL , 'ME' , 7);
+INSERT INTO DEPARTMENT VALUES(FORDEPT.NEXTVAL , 'EEE' , 5);
+INSERT INTO DEPARTMENT VALUES(FORDEPT.NEXTVAL , 'CSE' , 3);
+INSERT INTO DEPARTMENT VALUES(FORDEPT.NEXTVAL , 'MANAGEMENT' , 17);
+
+BUILDING :
+INSERT INTO BUILDING VALUES(201 , 'NEWTON');
+INSERT INTO BUILDING VALUES(202 , 'TESLA');
+INSERT INTO BUILDING VALUES(203 , 'EINSTEIN');
+INSERT INTO BUILDING VALUES(204 , 'GALILEO');
+INSERT INTO BUILDING VALUES(205 , 'STEPHEN');
+
+ROOM :
+INSERT INTO ROOM VALUES(34 , 201 , 50);
+INSERT INTO ROOM VALUES(55 , 202 , 45);
+
+EMPLOYEE: 
+INSERT INTO EMPLOYEE VALUES(ForEmp.nextval,'RAHUL SHARMA',7648436616,'rahul@gmail.com','Sector 27 ,Chandigarh',TO_DATE('22/11/2017','DD/MM/YYYY'),10);
+INSERT INTO EMPLOYEE VALUES(ForEmp.nextval,'AKSHAY MALIK',8726520295,'akshay@gmail.com','Sector 21 ,Chandigarh',TO_DATE('01/08/2020','DD/MM/YYYY'),20);
+INSERT INTO EMPLOYEE VALUES(ForEmp.nextval,'VINIT GOYAL',2809359551,'vinit@gmail.com','Sector 11 ,Chandigarh',TO_DATE('05/09/2021','DD/MM/YYYY'),30);
+INSERT INTO EMPLOYEE VALUES(ForEmp.nextval,'KAPIL SAINI',2428287834,'kapil@gmail.com','Sector 2 ,Chandigarh',TO_DATE('08/10/2020','DD/MM/YYYY'),40);
+INSERT INTO EMPLOYEE VALUES(ForEmp.nextval,'RAJBIR SINGH',9201000991,'rajbir@gmail.com','Sector 17 ,Chandigarh',TO_DATE('17/05/2019','DD/MM/YYYY'),50);
+INSERT INTO EMPLOYEE VALUES(ForEmp.nextval,'URVASHI CHOUBEY',7044553351,'urvashi@gmail.com','Sector 01 ,Chandigarh',TO_DATE('01/09/2020','DD/MM/YYYY'),50);
+INSERT INTO EMPLOYEE VALUES(ForEmp.nextval,'RAKESH',7452201446,'rakesh@gmail.com','Sector 01 ,Chandigarh',TO_DATE('01/09/2020','DD/MM/YYYY'),50);
+INSERT INTO EMPLOYEE VALUES(ForEmp.nextval,'RANVEER SINGH',3532291709,'ranveer@gmail.com','Sector 01 ,Chandigarh',TO_DATE('01/09/2020','DD/MM/YYYY'),50);
+INSERT INTO EMPLOYEE VALUES(ForEmp.nextval,'AMAN SHARMA',6442413873,'aman@gmail.com','Sector 01 ,Chandigarh',TO_DATE('01/09/2020','DD/MM/YYYY'),50);
+
+EMPLOYEE SAL DETAILS:
+INSERT INTO EMPLOYEE_SAL_DETAILS VALUES(332329020345,100,'RAHUL SHARMA',15000,0);
+INSERT INTO EMPLOYEE_SAL_DETAILS VALUES(366855344342,101,'AKSHAY MALIK',20000,0);
+INSERT INTO EMPLOYEE_SAL_DETAILS VALUES(939631189422,102,'VINIT GOYAL',25000,0);
+INSERT INTO EMPLOYEE_SAL_DETAILS VALUES(211635548739,103,'KAPIL SAINI',30000,0);
+INSERT INTO EMPLOYEE_SAL_DETAILS VALUES(177323139284,104,'RAJBIR SINGH',12000,0);
+
+INSTRUCTOR:
+INSERT INTO INSTRUCTOR VALUES(100);
+INSERT INTO INSTRUCTOR VALUES(101);
+INSERT INTO INSTRUCTOR VALUES(102);
+INSERT INTO INSTRUCTOR VALUES(103);
+INSERT INTO INSTRUCTOR VALUES(104);
+
+MENTOR:
+INSERT INTO MENTOR VALUES(100);
+INSERT INTO MENTOR VALUES(101);
+INSERT INTO MENTOR VALUES(102);
+
+ADMINISTRATION:
+INSERT INTO ADMINISTRATION VALUES(105,'REGISTRAR');
+
+LIBRARIAN:
+INSERT INTO LIBRARIAN VALUES(106);
+INSERT INTO LIBRARIAN VALUES(107);
+INSERT INTO LIBRARIAN VALUES(108);
+
+BOOK :
+INSERT INTO BOOK VALUES(011 , 'WINGS OF FIRE');
+INSERT INTO BOOK VALUES(012 , 'DISCOVERY OF INDIA');
+INSERT INTO BOOK VALUES(013 , 'JUNGLE BOOK');
+INSERT INTO BOOK VALUES(014 , 'PASSAGE OF INDIA');
+INSERT INTO BOOK VALUES(015 , 'INVISIBLE MAN');
+
+BOOK_HAS_COPIES :
+INSERT INTO BOOK_HAS_COPIES VALUES(1,11,'N');
+INSERT INTO BOOK_HAS_COPIES VALUES(2,11,'N');
+INSERT INTO BOOK_HAS_COPIES VALUES(1,12,'N');
+INSERT INTO BOOK_HAS_COPIES VALUES(2,12,'N');
+INSERT INTO BOOK_HAS_COPIES VALUES(1,13,'N');
+INSERT INTO BOOK_HAS_COPIES VALUES(2,13,'N');
+INSERT INTO BOOK_HAS_COPIES VALUES(1,14,'N');
+INSERT INTO BOOK_HAS_COPIES VALUES(2,14,'N');
+INSERT INTO BOOK_HAS_COPIES VALUES(3,14,'N');
+
+INSTRUCTOR_HAS_BOOKS :
+INSERT INTO INSTRUCTOR_HAS_BOOKS VALUES(1,13,100,SYSDATE,NULL);
+INSERT INTO INSTRUCTOR_HAS_BOOKS VALUES(3,14,101,SYSDATE,NULL);
+INSERT INTO INSTRUCTOR_HAS_BOOKS VALUES(2,12,102,SYSDATE,NULL);
+
+STUDENT_ISSUES_BOOKS :
+INSERT INTO STUDENT_ISSUES_BOOKS VALUES(1,11,3,SYSDATE,NULL);
+INSERT INTO STUDENT_ISSUES_BOOKS VALUES(2,11,5,SYSDATE,NULL);
+INSERT INTO STUDENT_ISSUES_BOOKS VALUES(2,13,1,SYSDATE,NULL);
+
+LIBRARIAN_MAINTAINS :
+INSERT INTO LIBRARIAN_MAINTAINS VALUES(11,106,150,50);
+INSERT INTO LIBRARIAN_MAINTAINS VALUES(12,106,250,50);
+INSERT INTO LIBRARIAN_MAINTAINS VALUES(13,107,80,50);
+INSERT INTO LIBRARIAN_MAINTAINS VALUES(14,108,150,50);
+INSERT INTO LIBRARIAN_MAINTAINS VALUES(15,107,70,50);
+
+GUARDIAN :
+INSERT INTO GUARDIAN VALUES(ForGuardians.nextval,'Abhijit','Nandita','Mehrauli Gurgaon Road, Gurgaon',6018929463);
+INSERT INTO GUARDIAN VALUES(ForGuardians.nextval,'Akshat','Neetu','16, Shyam Bazar, Chandni Chowk,Faridabad',4862110941);
+INSERT INTO GUARDIAN VALUES(ForGuardians.nextval,'Sanjeet','Meenakshi','33, Shree Society, R V Desai Road, Bhiwani',4970577610);
+INSERT INTO GUARDIAN VALUES(ForGuardians.nextval,'Sumit','Mallika','37, Gyan Society,Near Rose Garden,Hisar',6982051066);
+INSERT INTO GUARDIAN VALUES(ForGuardians.nextval,'Aniket','Deepa','32, Shree Society, R V Desai Road, Bhiwani',566586461);
+
+STUDENT :
+INSERT INTO STUDENT VALUES(ForStudents.NEXTVAL , 'SAHIL MEHTA' , TO_DATE('22/01/2002','DD/MM/YYYY') , 'Mehrauli Gurgaon Road, Gurgaon' , 'M' , 456732 , 'sahil@gmail.com' , 10 , 1);
+INSERT INTO STUDENT VALUES(ForStudents.NEXTVAL , 'SUMIT' , TO_DATE('29/08/2002','DD/MM/YYYY') , '16, Shyam Bazar, Chandni Chowk,Faridabad' , 'M' , 657589 , 'sumit@gmail.com' , 20 , 2);
+INSERT INTO STUDENT VALUES(ForStudents.NEXTVAL , 'UJJWAL' , TO_DATE('08/02/2004','DD/MM/YYYY') , '33, Shree Society, R V Desai Road, Bhiwani' , 'M' , 657582 , 'ujjwal@gmail.com' , 30 , 3);
+INSERT INTO STUDENT VALUES(ForStudents.NEXTVAL , 'VIPUL KUMAR' , TO_DATE('02/09/2002','DD/MM/YYYY') , '37, Gyan Society,Near Rose Garden,Hisar' , 'M' , 12334 , 'vipul@gmail.com' , 40 , 4);
+INSERT INTO STUDENT VALUES(ForStudents.NEXTVAL , 'URVASHI' , TO_DATE('01/09/2002','DD/MM/YYYY') , '32, Shree Society, R V Desai Road, Bhiwani' , 'F' , 974655 , 'urvashi@gmail.com' , 50 , 5);
+
+COOP :
+INSERT INTO COOP VALUES(1111 , 'GeeksForGeeks' , 'Campus Ambassador');
+INSERT INTO COOP VALUES(1901 , 'TwoWaits' , 'DSA SCHOLAR');
+
+STUDENT_HAS_COOP :
+INSERT INTO STUDENT_HAS_COOP VALUES(3, 6 , 0,1111);
+INSERT INTO STUDENT_HAS_COOP VALUES(5, 6 , 0,1901);
+
+STUD_VISADETAILS :
+INSERT INTO STUD_VISADETAILS VALUES( 2 , 999112313771 , 'ACTIVE');
+INSERT INTO STUD_VISADETAILS VALUES( 4 , 111787363918 , 'ACTIVE');
+
+FEE_PAYMENT :
+INSERT INTO FEE_PAYMENT VALUES(12101871 , 1 ,SYSDATE , 30000, 15000, 1);
+
+COURSE :
+INSERT INTO COURSE VALUES(ForCourses.nextval,'DBMS',05,130,65,50);
+INSERT INTO COURSE VALUES(ForCourses.nextval,'DSA',07,150,75,50);
+INSERT INTO COURSE VALUES(ForCourses.nextval,'DISCRETE STRUCTURES',04,120,60,10);
+INSERT INTO COURSE VALUES(ForCourses.nextval,'DELD',05,130,65,40);
+INSERT INTO COURSE VALUES(ForCourses.nextval,'AWD',05,130,65,50);
+
+STUDENT_REGISTERS_COURSES :
+INSERT INTO STUDENT_REGISTERS_COURSES VALUES(1,30,SYSDATE);
+INSERT INTO STUDENT_REGISTERS_COURSES VALUES(2,20,SYSDATE);
+INSERT INTO STUDENT_REGISTERS_COURSES VALUES(2,30,SYSDATE);
+INSERT INTO STUDENT_REGISTERS_COURSES VALUES(3,50,SYSDATE);
+
+GROUPS :
+INSERT INTO GROUPS VALUES(ForGroups.NEXTVAL , 10 , 100 , 101 , 201);
+INSERT INTO GROUPS VALUES(ForGroups.NEXTVAL , 20 , 101 , 100 , 202);
+INSERT INTO GROUPS VALUES(ForGroups.NEXTVAL , 30 , 102 , 102 , 203);
+INSERT INTO GROUPS VALUES(ForGroups.NEXTVAL , 40 , 103 , 100 , 205);
+INSERT INTO GROUPS VALUES(ForGroups.NEXTVAL , 50 , 104 , 101 , 204);
+
+
+
+
+
+
+
+
+
+
+
+
+
